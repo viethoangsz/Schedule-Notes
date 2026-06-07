@@ -9,7 +9,7 @@ class DatabaseHelper {
   DatabaseHelper._internal();
 
   static const String _dbName = 'schedule_notes.db';
-  static const int _dbVersion = 2;
+  static const int _dbVersion = 3;
 
   static const String tableNotes = 'notes';
   static const String tableTasks = 'tasks';
@@ -41,7 +41,8 @@ class DatabaseHelper {
         content TEXT NOT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
-        is_pinned INTEGER NOT NULL DEFAULT 0
+        is_pinned INTEGER NOT NULL DEFAULT 0,
+        tags TEXT NOT NULL DEFAULT ''
       )
     ''');
 
@@ -53,7 +54,9 @@ class DatabaseHelper {
         date TEXT NOT NULL,
         time TEXT,
         priority INTEGER NOT NULL DEFAULT 1,
-        completed INTEGER NOT NULL DEFAULT 0
+        completed INTEGER NOT NULL DEFAULT 0,
+        repeat_type TEXT NOT NULL DEFAULT 'none',
+        repeat_days TEXT NOT NULL DEFAULT ''
       )
     ''');
 
@@ -88,6 +91,17 @@ class DatabaseHelper {
           created_at TEXT NOT NULL
         )
       ''');
+    }
+    if (oldVersion < 3) {
+      try {
+        await db.execute("ALTER TABLE $tableNotes ADD COLUMN tags TEXT NOT NULL DEFAULT ''");
+      } catch (_) {}
+      try {
+        await db.execute("ALTER TABLE $tableTasks ADD COLUMN repeat_type TEXT NOT NULL DEFAULT 'none'");
+      } catch (_) {}
+      try {
+        await db.execute("ALTER TABLE $tableTasks ADD COLUMN repeat_days TEXT NOT NULL DEFAULT ''");
+      } catch (_) {}
     }
   }
 

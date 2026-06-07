@@ -1,6 +1,3 @@
-// providers/task_provider.dart
-// Quản lý state cho công việc/lịch trình sử dụng Provider pattern
-
 import 'package:flutter/foundation.dart';
 import '../models/task.dart';
 import '../services/task_service.dart';
@@ -15,15 +12,19 @@ class TaskProvider with ChangeNotifier {
   bool _isLoading = false;
   DateTime _selectedDate = DateTime.now();
   Map<String, int> _todayStats = {'total': 0, 'completed': 0, 'pending': 0};
+  Set<String> _datesWithTasks = {};
+  int _calendarYear = DateTime.now().year;
+  int _calendarMonth = DateTime.now().month;
 
-  // Getters
   List<Task> get tasks => _tasks;
   List<Task> get todayTasks => _todayTasks;
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
   Map<String, int> get todayStats => _todayStats;
+  Set<String> get datesWithTasks => _datesWithTasks;
+  int get calendarYear => _calendarYear;
+  int get calendarMonth => _calendarMonth;
 
-  /// Tasks của ngày được chọn
   List<Task> get selectedDateTasks {
     return _tasks.where((task) {
       return task.date.year == _selectedDate.year &&
@@ -32,15 +33,14 @@ class TaskProvider with ChangeNotifier {
     }).toList();
   }
 
-  /// Tải tất cả tasks
   Future<void> loadTasks() async {
     _isLoading = true;
     notifyListeners();
-
     try {
       _tasks = await _taskService.getAllTasks();
       _todayTasks = await _taskService.getTodayTasks();
       _todayStats = await _taskService.getTodayStats();
+      await _loadCalendarDots();
     } catch (e) {
       debugPrint('Error loading tasks: $e');
     } finally {
@@ -49,30 +49,30 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  /// Tải tasks của ngày được chọn
-  Future<void> loadTasksByDate(DateTime date) async {
-    _selectedDate = date;
-    try {
-      _tasks = await _taskService.getAllTasks();
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error loading tasks by date: $e');
-    }
+  Future<void> _loadCalendarDots() async {
+    _datesWithTasks = await _taskService.getDatesWithTasks(_calendarYear, _calendarMonth);
   }
 
-  /// Thay đổi ngày được chọn
+  Future<void> loadCalendarMonth(int year, int month) async {
+    _calendarYear = year;
+    _calendarMonth = month;
+    await _loadCalendarDots();
+    notifyListeners();
+  }
+
   void setSelectedDate(DateTime date) {
     _selectedDate = date;
     notifyListeners();
   }
 
-  /// Tạo công việc mới
   Future<Task?> createTask({
     required String title,
     required String description,
     required DateTime date,
     String? time,
     Priority priority = Priority.medium,
+    RepeatType repeatType = RepeatType.none,
+    List<int> repeatDays = const [],
   }) async {
     try {
       final task = Task(
@@ -81,14 +81,13 @@ class TaskProvider with ChangeNotifier {
         date: date,
         time: time,
         priority: priority,
+        repeatType: repeatType,
+        repeatDays: repeatDays,
       );
       final createdTask = await _taskService.createTask(task);
-
-      // Lên lịch thông báo nếu có giờ
       if (time != null) {
         await _notificationService.scheduleTaskNotification(createdTask);
       }
-
       await loadTasks();
       return createdTask;
     } catch (e) {
@@ -97,17 +96,13 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  /// Cập nhật công việc
   Future<bool> updateTask(Task task) async {
     try {
       await _taskService.updateTask(task);
-
-      // Hủy notification cũ và tạo mới
       await _notificationService.cancelTaskNotification(task.id!);
       if (task.time != null && !task.completed) {
         await _notificationService.scheduleTaskNotification(task);
       }
-
       await loadTasks();
       return true;
     } catch (e) {
@@ -116,7 +111,6 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  /// Xóa công việc
   Future<bool> deleteTask(int id) async {
     try {
       await _notificationService.cancelTaskNotification(id);
@@ -129,16 +123,12 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  /// Toggle trạng thái hoàn thành
   Future<void> toggleComplete(Task task) async {
     try {
       await _taskService.toggleComplete(task);
-
-      // Hủy notification nếu task đã hoàn thành
       if (!task.completed && task.id != null) {
         await _notificationService.cancelTaskNotification(task.id!);
       }
-
       await loadTasks();
     } catch (e) {
       debugPrint('Error toggling task complete: $e');

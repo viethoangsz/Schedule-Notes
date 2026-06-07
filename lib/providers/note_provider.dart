@@ -1,6 +1,3 @@
-// providers/note_provider.dart
-// Quản lý state cho ghi chú sử dụng Provider pattern
-
 import 'package:flutter/foundation.dart';
 import '../models/note.dart';
 import '../services/note_service.dart';
@@ -10,32 +7,36 @@ class NoteProvider with ChangeNotifier {
 
   List<Note> _notes = [];
   List<Note> _searchResults = [];
+  List<String> _allTags = [];
+  String? _activeTag;
   bool _isLoading = false;
   bool _isSearching = false;
   String _searchQuery = '';
 
-  // Getters
   List<Note> get notes => _notes;
   List<Note> get searchResults => _searchResults;
+  List<String> get allTags => _allTags;
+  String? get activeTag => _activeTag;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
   String get searchQuery => _searchQuery;
 
-  /// Lấy ghi chú được hiển thị (tìm kiếm hoặc tất cả)
-  List<Note> get displayedNotes =>
-      _isSearching ? _searchResults : _notes;
+  List<Note> get displayedNotes {
+    if (_isSearching) return _searchResults;
+    if (_activeTag != null) {
+      return _notes.where((n) => n.tags.contains(_activeTag)).toList();
+    }
+    return _notes;
+  }
 
-  /// Lấy các ghi chú được ghim
-  List<Note> get pinnedNotes =>
-      _notes.where((note) => note.isPinned).toList();
+  List<Note> get pinnedNotes => _notes.where((note) => note.isPinned).toList();
 
-  /// Tải tất cả ghi chú từ database
   Future<void> loadNotes() async {
     _isLoading = true;
     notifyListeners();
-
     try {
       _notes = await _noteService.getAllNotes();
+      _allTags = await _noteService.getAllTags();
     } catch (e) {
       debugPrint('Error loading notes: $e');
     } finally {
@@ -44,10 +45,10 @@ class NoteProvider with ChangeNotifier {
     }
   }
 
-  /// Tạo ghi chú mới
   Future<Note?> createNote({
     required String title,
     required String content,
+    List<String> tags = const [],
   }) async {
     try {
       final now = DateTime.now();
@@ -56,9 +57,10 @@ class NoteProvider with ChangeNotifier {
         content: content,
         createdAt: now,
         updatedAt: now,
+        tags: tags,
       );
       final createdNote = await _noteService.createNote(note);
-      await loadNotes(); // Reload để cập nhật danh sách
+      await loadNotes();
       return createdNote;
     } catch (e) {
       debugPrint('Error creating note: $e');
@@ -66,7 +68,6 @@ class NoteProvider with ChangeNotifier {
     }
   }
 
-  /// Cập nhật ghi chú
   Future<bool> updateNote(Note note) async {
     try {
       await _noteService.updateNote(note);
@@ -78,7 +79,6 @@ class NoteProvider with ChangeNotifier {
     }
   }
 
-  /// Xóa ghi chú
   Future<bool> deleteNote(int id) async {
     try {
       await _noteService.deleteNote(id);
@@ -90,7 +90,6 @@ class NoteProvider with ChangeNotifier {
     }
   }
 
-  /// Toggle ghim ghi chú
   Future<void> togglePin(Note note) async {
     try {
       await _noteService.togglePin(note);
@@ -100,17 +99,15 @@ class NoteProvider with ChangeNotifier {
     }
   }
 
-  /// Tìm kiếm ghi chú
   Future<void> search(String query) async {
     _searchQuery = query;
     _isSearching = query.isNotEmpty;
-
+    _activeTag = null;
     if (!_isSearching) {
       _searchResults = [];
       notifyListeners();
       return;
     }
-
     try {
       _searchResults = await _noteService.searchNotes(query);
     } catch (e) {
@@ -120,10 +117,17 @@ class NoteProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Xóa tìm kiếm
   void clearSearch() {
     _searchQuery = '';
     _isSearching = false;
+    _searchResults = [];
+    notifyListeners();
+  }
+
+  void filterByTag(String? tag) {
+    _activeTag = tag;
+    _isSearching = false;
+    _searchQuery = '';
     _searchResults = [];
     notifyListeners();
   }

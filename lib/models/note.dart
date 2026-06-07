@@ -1,6 +1,3 @@
-// models/note.dart
-// Model đại diện cho một ghi chú trong ứng dụng
-
 class Note {
   final int? id;
   final String title;
@@ -8,6 +5,7 @@ class Note {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isPinned;
+  final List<String> tags;
 
   Note({
     this.id,
@@ -16,10 +14,11 @@ class Note {
     required this.createdAt,
     required this.updatedAt,
     this.isPinned = false,
+    this.tags = const [],
   });
 
-  /// Tạo Note từ Map (dữ liệu từ SQLite)
   factory Note.fromMap(Map<String, dynamic> map) {
+    final tagsStr = map['tags'] as String? ?? '';
     return Note(
       id: map['id'] as int?,
       title: map['title'] as String,
@@ -27,10 +26,10 @@ class Note {
       createdAt: DateTime.parse(map['created_at'] as String),
       updatedAt: DateTime.parse(map['updated_at'] as String),
       isPinned: (map['is_pinned'] as int) == 1,
+      tags: tagsStr.isEmpty ? [] : tagsStr.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList(),
     );
   }
 
-  /// Chuyển Note thành Map để lưu vào SQLite
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,
@@ -39,10 +38,10 @@ class Note {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'is_pinned': isPinned ? 1 : 0,
+      'tags': tags.join(','),
     };
   }
 
-  /// Tạo bản sao có thay đổi một số trường
   Note copyWith({
     int? id,
     String? title,
@@ -50,6 +49,7 @@ class Note {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isPinned,
+    List<String>? tags,
   }) {
     return Note(
       id: id ?? this.id,
@@ -58,11 +58,10 @@ class Note {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isPinned: isPinned ?? this.isPinned,
+      tags: tags ?? this.tags,
     );
   }
 
   @override
-  String toString() {
-    return 'Note(id: $id, title: $title, isPinned: $isPinned)';
-  }
+  String toString() => 'Note(id: $id, title: $title, isPinned: $isPinned, tags: $tags)';
 }
