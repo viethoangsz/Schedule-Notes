@@ -1,0 +1,1 @@
+- [Flutter APK build quota](flutter-apk-quota.md) — Replit free tier has ~5GB user quota; Flutter NDK (2GB) + Gradle transforms (2GB) + SDK (0.6GB) exceeds it. GitHub Actions is the solution.
