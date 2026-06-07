@@ -1,0 +1,13 @@
+uploads = []
+
+[[generated]]
+id = "iGONMlPmy-33XbQWGINgJ"
+uri = "file://assets/icon/app_icon.png"
+type = "image"
+title = "schedule notes app icon"
+
+[[outputs]]
+id = "od4zEu-oG4yfGCzkD77SQ"
+uri = "file://assets/icon/app_icon.png"
+type = "image"
+title = "App Icon - Schedule Notes"

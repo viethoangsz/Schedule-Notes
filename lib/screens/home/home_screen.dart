@@ -10,6 +10,7 @@ import '../../utils/date_utils.dart';
 import '../../utils/app_theme.dart';
 import '../tasks/task_form_screen.dart';
 import '../notes/note_editor_screen.dart';
+import '../search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -181,6 +182,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return 'Chào buổi tối! 🌙';
   }
 
+  void _openSearch() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SearchScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -191,9 +199,39 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 170,
+            expandedHeight: 180,
             floating: false,
             pinned: true,
+            backgroundColor: cs.primary,
+            foregroundColor: cs.onPrimary,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            toolbarHeight: 52,
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: cs.onPrimary.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.event_note_rounded, color: cs.onPrimary, size: 18),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Schedule Notes',
+                  style: TextStyle(color: cs.onPrimary, fontWeight: FontWeight.w700, fontSize: 17),
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                onPressed: _openSearch,
+                icon: Icon(Icons.search_rounded, color: cs.onPrimary),
+                tooltip: 'Tìm kiếm',
+              ),
+              const SizedBox(width: 4),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
               background: Container(
@@ -206,28 +244,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 56, 20, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: cs.onPrimary.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(Icons.event_note_rounded, color: cs.onPrimary, size: 22),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Schedule Notes',
-                              style: TextStyle(color: cs.onPrimary, fontWeight: FontWeight.w700, fontSize: 18),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 10),
                         Text(
                           _getGreeting(),
                           style: TextStyle(color: cs.onPrimary, fontWeight: FontWeight.bold, fontSize: 22),
@@ -235,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         const SizedBox(height: 2),
                         Text(
                           DateTimeUtils.formatDateFull(now),
-                          style: TextStyle(color: cs.onPrimary.withOpacity(0.75), fontSize: 13),
+                          style: TextStyle(color: cs.onPrimary.withOpacity(0.78), fontSize: 13),
                         ),
                       ],
                     ),
@@ -243,8 +264,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ),
               ),
             ),
-            backgroundColor: cs.primary,
-            toolbarHeight: 0,
           ),
 
           SliverToBoxAdapter(

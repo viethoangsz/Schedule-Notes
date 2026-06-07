@@ -5,7 +5,6 @@ import 'notes/notes_screen.dart';
 import 'alarm/alarm_screen.dart';
 import 'tools/tools_screen.dart';
 import 'settings/settings_screen.dart';
-import 'search/search_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -26,42 +25,10 @@ class _MainNavigationState extends State<MainNavigation> {
     const SettingsScreen(),
   ];
 
-  void _openSearch() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SearchScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return Scaffold(
-      body: Stack(
-        children: [
-          IndexedStack(index: _currentIndex, children: _screens),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: SafeArea(
-              child: _currentIndex == 0
-                  ? Padding(
-                      padding: const EdgeInsets.only(right: 8, top: 6),
-                      child: IconButton(
-                        onPressed: _openSearch,
-                        icon: Icon(Icons.search_rounded, color: cs.onPrimary),
-                        tooltip: 'Tìm kiếm',
-                        style: IconButton.styleFrom(
-                          backgroundColor: cs.onPrimary.withOpacity(0.15),
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ),
-        ],
-      ),
+      body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
