@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.schedule_notes"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

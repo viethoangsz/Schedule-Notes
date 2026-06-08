@@ -39,7 +39,7 @@ class AppTheme {
         ),
       ),
 
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         color: colorScheme.surfaceContainerHighest,
@@ -128,7 +128,7 @@ class AppTheme {
         ),
       ),
 
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         color: colorScheme.surfaceContainerHighest,
