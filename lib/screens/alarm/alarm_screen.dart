@@ -94,7 +94,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
                 alarm: alarms[index],
                 onToggle: () => provider.toggleAlarm(alarms[index]),
                 onEdit: () => _openForm(context, alarm: alarms[index]),
-                onDelete: () => _confirmDelete(context, alarms[index], provider),
+                onDelete: () => provider.deleteAlarm(alarms[index].id!),
               );
             },
           );
@@ -115,28 +115,6 @@ class _AlarmScreenState extends State<AlarmScreen> {
     ).then((_) => context.read<AlarmProvider>().loadAlarms());
   }
 
-  void _confirmDelete(BuildContext context, Alarm alarm, AlarmProvider provider) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Xóa báo thức?'),
-        content: Text('Xóa báo thức "${alarm.title}"?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              provider.deleteAlarm(alarm.id!);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('Xóa'),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _AlarmCard extends StatelessWidget {
@@ -170,6 +148,29 @@ class _AlarmCard extends StatelessWidget {
         ),
         child: Icon(Icons.delete_outline, color: cs.onErrorContainer),
       ),
+      confirmDismiss: (_) async {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Xóa báo thức?'),
+            content: Text('Xóa báo thức "${alarm.title}"?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Hủy'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: const Text('Xóa'),
+              ),
+            ],
+          ),
+        );
+        return confirmed == true;
+      },
       onDismissed: (_) => onDelete(),
       child: GestureDetector(
         onTap: onEdit,
