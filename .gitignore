@@ -1,0 +1,13 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
+# Android local config (machine-specific, do not commit)
+android/local.properties
+
+# Misc
+.DS_Store
+*.log
