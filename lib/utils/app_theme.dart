@@ -168,9 +168,9 @@ class AppTheme {
 
   static Color priorityColor(dynamic priority) {
     switch (priority.toString()) {
-      case 'Priority.high': return priorityHigh;
-      case 'Priority.medium': return priorityMedium;
-      case 'Priority.low': return priorityLow;
+      case 'TaskPriority.high': return priorityHigh;
+      case 'TaskPriority.medium': return priorityMedium;
+      case 'TaskPriority.low': return priorityLow;
       default: return priorityMedium;
     }
   }

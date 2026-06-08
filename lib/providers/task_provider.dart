@@ -70,7 +70,7 @@ class TaskProvider with ChangeNotifier {
     required String description,
     required DateTime date,
     String? time,
-    Priority priority = Priority.medium,
+    TaskPriority priority = TaskPriority.medium,
     RepeatType repeatType = RepeatType.none,
     List<int> repeatDays = const [],
   }) async {

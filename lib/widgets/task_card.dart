@@ -108,7 +108,7 @@ class TaskCard extends StatelessWidget {
                                 : colorScheme.secondary,
                           ),
 
-                        // Priority
+                        // TaskPriority
                         _buildTag(
                           context,
                           icon: Icons.flag_outlined,

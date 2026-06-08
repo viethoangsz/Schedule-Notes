@@ -21,7 +21,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   late TextEditingController _descriptionController;
   late DateTime _selectedDate;
   TimeOfDay? _selectedTime;
-  late Priority _selectedPriority;
+  late TaskPriority _selectedPriority;
   late RepeatType _selectedRepeatType;
   List<int> _selectedRepeatDays = [];
   bool _isSaving = false;
@@ -45,7 +45,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     _titleController = TextEditingController(text: task?.title ?? widget.initialTitle ?? '');
     _descriptionController = TextEditingController(text: task?.description ?? '');
     _selectedDate = task?.date ?? DateTime.now();
-    _selectedPriority = task?.priority ?? Priority.medium;
+    _selectedPriority = task?.priority ?? TaskPriority.medium;
     _selectedRepeatType = task?.repeatType ?? RepeatType.none;
     _selectedRepeatDays = List<int>.from(task?.repeatDays ?? []);
 
@@ -151,7 +151,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
             const SizedBox(height: 12),
 
             Row(
-              children: Priority.values.map((priority) {
+              children: TaskPriority.values.map((priority) {
                 final isSelected = _selectedPriority == priority;
                 final color = AppTheme.priorityColor(priority);
                 return Expanded(

@@ -1,28 +1,28 @@
-enum Priority { low, medium, high }
+enum TaskPriority { low, medium, high }
 
-extension PriorityExtension on Priority {
+extension PriorityExtension on TaskPriority {
   String get label {
     switch (this) {
-      case Priority.low: return 'Thấp';
-      case Priority.medium: return 'Trung bình';
-      case Priority.high: return 'Cao';
+      case TaskPriority.low: return 'Thấp';
+      case TaskPriority.medium: return 'Trung bình';
+      case TaskPriority.high: return 'Cao';
     }
   }
 
   int get value {
     switch (this) {
-      case Priority.low: return 0;
-      case Priority.medium: return 1;
-      case Priority.high: return 2;
+      case TaskPriority.low: return 0;
+      case TaskPriority.medium: return 1;
+      case TaskPriority.high: return 2;
     }
   }
 
-  static Priority fromValue(int value) {
+  static TaskPriority fromValue(int value) {
     switch (value) {
-      case 0: return Priority.low;
-      case 1: return Priority.medium;
-      case 2: return Priority.high;
-      default: return Priority.medium;
+      case 0: return TaskPriority.low;
+      case 1: return TaskPriority.medium;
+      case 2: return TaskPriority.high;
+      default: return TaskPriority.medium;
     }
   }
 }
@@ -64,7 +64,7 @@ class Task {
   final String description;
   final DateTime date;
   final String? time;
-  final Priority priority;
+  final TaskPriority priority;
   final bool completed;
   final RepeatType repeatType;
   final List<int> repeatDays;
@@ -75,7 +75,7 @@ class Task {
     required this.description,
     required this.date,
     this.time,
-    this.priority = Priority.medium,
+    this.priority = TaskPriority.medium,
     this.completed = false,
     this.repeatType = RepeatType.none,
     this.repeatDays = const [],
@@ -148,7 +148,7 @@ class Task {
     String? description,
     DateTime? date,
     String? time,
-    Priority? priority,
+    TaskPriority? priority,
     bool? completed,
     RepeatType? repeatType,
     List<int>? repeatDays,
