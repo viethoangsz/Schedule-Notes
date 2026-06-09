@@ -128,6 +128,9 @@ class TaskProvider with ChangeNotifier {
       await _taskService.toggleComplete(task);
       if (!task.completed && task.id != null) {
         await _notificationService.cancelTaskNotification(task.id!);
+      } else if (task.completed && task.id != null && task.time != null) {
+        final uncompleted = task.copyWith(completed: false);
+        await _notificationService.scheduleTaskNotification(uncompleted);
       }
       await loadTasks();
     } catch (e) {

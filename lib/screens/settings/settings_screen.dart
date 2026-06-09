@@ -5,6 +5,7 @@ import '../../providers/task_provider.dart';
 import '../../providers/alarm_provider.dart';
 import '../../services/notification_service.dart';
 import '../../services/export_import_service.dart';
+import '../../database/database_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -252,15 +253,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber, color: Theme.of(context).colorScheme.error, size: 40),
         title: const Text('Xóa tất cả dữ liệu?'),
-        content: const Text('Hành động này sẽ xóa toàn bộ ghi chú và công việc. Dữ liệu không thể khôi phục!'),
+        content: const Text('Hành động này sẽ xóa toàn bộ ghi chú, công việc và báo thức. Dữ liệu không thể khôi phục!'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
           FilledButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã xóa tất cả dữ liệu'), behavior: SnackBarBehavior.floating),
-              );
+              try {
+                await NotificationService().cancelAllNotifications();
+                await DatabaseHelper().clearAll();
+                if (context.mounted) {
+                  context.read<NoteProvider>().loadNotes();
+                  context.read<TaskProvider>().loadTasks();
+                  context.read<AlarmProvider>().loadAlarms();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã xóa tất cả dữ liệu'), behavior: SnackBarBehavior.floating),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Lỗi: $e'), behavior: SnackBarBehavior.floating),
+                  );
+                }
+              }
             },
             style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
             child: const Text('Xóa tất cả'),

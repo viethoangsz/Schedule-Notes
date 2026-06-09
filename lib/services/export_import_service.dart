@@ -8,11 +8,13 @@ import '../models/alarm.dart';
 import 'note_service.dart';
 import 'task_service.dart';
 import 'alarm_service.dart';
+import 'notification_service.dart';
 
 class ExportImportService {
   final NoteService _noteService = NoteService();
   final TaskService _taskService = TaskService();
   final AlarmService _alarmService = AlarmService();
+  final NotificationService _notificationService = NotificationService();
 
   Future<String?> exportToJson() async {
     try {
@@ -95,7 +97,10 @@ class ExportImportService {
               'repeat_type': map['repeat_type'] ?? 'none',
               'repeat_days': map['repeat_days'] ?? '',
             });
-            await _taskService.createTask(task);
+            final created = await _taskService.createTask(task);
+            if (created.time != null && !created.completed) {
+              await _notificationService.scheduleTaskNotification(created);
+            }
             tasksImported++;
           } catch (e) {
             debugPrint('Error importing task: $e');
@@ -115,7 +120,10 @@ class ExportImportService {
               'vibrate': map['vibrate'] ?? 1,
               'enabled': map['enabled'] ?? 1,
             });
-            await _alarmService.createAlarm(alarm);
+            final created = await _alarmService.createAlarm(alarm);
+            if (created.enabled) {
+              await _notificationService.scheduleAlarm(created);
+            }
             alarmsImported++;
           } catch (e) {
             debugPrint('Error importing alarm: $e');
