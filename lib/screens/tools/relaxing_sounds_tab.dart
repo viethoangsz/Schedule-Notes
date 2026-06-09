@@ -118,7 +118,7 @@ class _RelaxingSoundsTabState extends State<RelaxingSoundsTab> with TickerProvid
               crossAxisCount: 2,
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
-              childAspectRatio: 0.9,
+              childAspectRatio: 0.78,
             ),
             itemCount: sounds.length,
             itemBuilder: (_, i) {

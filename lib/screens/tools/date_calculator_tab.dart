@@ -11,7 +11,7 @@ class DateCalculatorTab extends StatefulWidget {
 class _DateCalculatorTabState extends State<DateCalculatorTab> {
   DateTime _from = DateTime.now();
   DateTime _to = DateTime.now().add(const Duration(days: 30));
-  final _fmt = DateFormat('dd/MM/yyyy', 'vi');
+  final _fmt = DateFormat('dd/MM/yyyy');
 
   int get _diffDays => _to.difference(_from).inDays.abs();
   int get _diffWeeks => (_diffDays / 7).floor();
@@ -234,10 +234,13 @@ class _QuickAddState extends State<_QuickAdd> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final fmt = DateFormat('EEEE, dd/MM/yyyy', 'vi');
+    final fmt = DateFormat('dd/MM/yyyy');
     return Column(
       children: [
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             SegmentedButton<bool>(
               segments: const [
@@ -247,7 +250,6 @@ class _QuickAddState extends State<_QuickAdd> {
               selected: {_add},
               onSelectionChanged: (s) => setState(() => _add = s.first),
             ),
-            const SizedBox(width: 12),
             SizedBox(
               width: 60,
               child: TextField(
@@ -258,7 +260,6 @@ class _QuickAddState extends State<_QuickAdd> {
                 onChanged: (_) => _calc(),
               ),
             ),
-            const SizedBox(width: 12),
             DropdownButton<String>(
               value: _unit,
               items: ['Ngày', 'Tuần', 'Tháng', 'Năm']
@@ -266,13 +267,13 @@ class _QuickAddState extends State<_QuickAdd> {
                   .toList(),
               onChanged: (v) { setState(() => _unit = v!); _calc(); },
             ),
-            const SizedBox(width: 8),
             FilledButton.tonal(onPressed: _calc, child: const Text('Tính')),
           ],
         ),
         if (_result != null) ...[
           const SizedBox(height: 12),
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: cs.secondaryContainer,
@@ -282,8 +283,10 @@ class _QuickAddState extends State<_QuickAdd> {
               children: [
                 Icon(Icons.event_available, color: cs.onSecondaryContainer, size: 18),
                 const SizedBox(width: 8),
-                Text(fmt.format(_result!),
-                    style: TextStyle(fontWeight: FontWeight.w600, color: cs.onSecondaryContainer)),
+                Expanded(
+                  child: Text(fmt.format(_result!),
+                      style: TextStyle(fontWeight: FontWeight.w600, color: cs.onSecondaryContainer)),
+                ),
               ],
             ),
           ),
