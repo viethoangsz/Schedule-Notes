@@ -1,5 +1,11 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'unit_converter_tab.dart';
+import 'date_calculator_tab.dart';
+import 'base64_qr_tab.dart';
+import 'pomodoro_tab.dart';
+import 'relaxing_sounds_tab.dart';
 
 class ToolsScreen extends StatelessWidget {
   const ToolsScreen({super.key});
@@ -10,15 +16,22 @@ class ToolsScreen extends StatelessWidget {
     final cs = theme.colorScheme;
 
     return DefaultTabController(
-      length: 3,
+      length: 8,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Công cụ'),
           bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             tabs: const [
               Tab(icon: Icon(Icons.calculate_outlined), text: 'Máy tính'),
               Tab(icon: Icon(Icons.timer_outlined), text: 'Đồng hồ'),
               Tab(icon: Icon(Icons.hourglass_empty_outlined), text: 'Đếm ngược'),
+              Tab(icon: Icon(Icons.straighten), text: 'Đổi đơn vị'),
+              Tab(icon: Icon(Icons.date_range_outlined), text: 'Tính ngày'),
+              Tab(icon: Icon(Icons.code), text: 'Base64'),
+              Tab(icon: Icon(Icons.local_pizza_outlined), text: 'Pomodoro'),
+              Tab(icon: Icon(Icons.headphones_outlined), text: 'Thư giãn'),
             ],
             labelColor: cs.primary,
             unselectedLabelColor: cs.onSurfaceVariant,
@@ -30,6 +43,11 @@ class ToolsScreen extends StatelessWidget {
             _CalculatorTab(),
             _StopwatchTab(),
             _TimerTab(),
+            UnitConverterTab(),
+            DateCalculatorTab(),
+            Base64QrTab(),
+            PomodoroTab(),
+            RelaxingSoundsTab(),
           ],
         ),
       ),
@@ -144,10 +162,7 @@ class _CalculatorTabState extends State<_CalculatorTab> {
                 if (_expression.isNotEmpty)
                   Text(
                     _expression,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: cs.onSurfaceVariant,
-                    ),
+                    style: TextStyle(fontSize: 16, color: cs.onSurfaceVariant),
                     textAlign: TextAlign.right,
                   ),
                 const SizedBox(height: 4),
@@ -347,10 +362,8 @@ class _StopwatchTabState extends State<_StopwatchTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Lap ${_laps.length - index}',
-                      style: TextStyle(color: cs.onSurfaceVariant),
-                    ),
+                    Text('Lap ${_laps.length - index}',
+                        style: TextStyle(color: cs.onSurfaceVariant)),
                     Text(
                       _laps[index],
                       style: const TextStyle(
@@ -492,11 +505,7 @@ class _TimerTabState extends State<_TimerTab> {
               padding: const EdgeInsets.only(top: 12),
               child: Text(
                 '⏰ Hết giờ!',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: cs.error,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: cs.error),
               ),
             ),
           const SizedBox(height: 32),
@@ -541,7 +550,7 @@ class _TimeInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return SizedBox(
-      width: 48,
+      width: 52,
       child: TextField(
         controller: ctrl,
         keyboardType: TextInputType.number,
