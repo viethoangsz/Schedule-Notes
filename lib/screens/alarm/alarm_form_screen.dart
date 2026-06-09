@@ -414,8 +414,11 @@ class _SoundSelector extends StatelessWidget {
             color: isCustom ? cs.primary : null,
           ),
           label: Text(
-            isCustom ? '✓ Đã chọn file' : 'Chọn nhạc từ điện thoại',
+            isCustom
+                ? '✓ ${selected.split('/').last}'
+                : 'Chọn nhạc từ điện thoại',
             style: TextStyle(color: isCustom ? cs.primary : null),
+            overflow: TextOverflow.ellipsis,
           ),
           style: OutlinedButton.styleFrom(
             minimumSize: const Size.fromHeight(44),

@@ -5,6 +5,7 @@ import 'providers/task_provider.dart';
 import 'providers/alarm_provider.dart';
 import 'services/notification_service.dart';
 import 'screens/main_navigation.dart';
+import 'screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -31,7 +32,7 @@ class ScheduleNotesApp extends StatelessWidget {
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
         locale: const Locale('vi', 'VN'),
-        home: const MainNavigation(),
+        home: const SplashScreen(),
       ),
     );
   }

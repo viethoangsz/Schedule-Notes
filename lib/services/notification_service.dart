@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import '../models/task.dart';
@@ -21,6 +22,12 @@ class NotificationService {
     if (_initialized) return;
 
     tz.initializeTimeZones();
+    try {
+      final String localTz = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(localTz));
+    } catch (_) {
+      tz.setLocalLocation(tz.getLocation('Asia/Ho_Chi_Minh'));
+    }
 
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
@@ -49,7 +56,17 @@ class NotificationService {
 
   void _onNotificationTap(NotificationResponse response) {}
 
-  AndroidNotificationDetails _androidDetails({String sound = 'alarm_default', bool vibrate = true}) {
+  AndroidNotificationSound _resolveSound(String sound) {
+    if (sound.startsWith('/')) {
+      return UriAndroidNotificationSound('file://$sound');
+    }
+    return RawResourceAndroidNotificationSound(sound);
+  }
+
+  AndroidNotificationDetails _androidDetails({
+    String sound = 'alarm_default',
+    bool vibrate = true,
+  }) {
     return AndroidNotificationDetails(
       'alarm_channel_$sound',
       'Báo thức & Nhắc nhở',
@@ -59,12 +76,15 @@ class NotificationService {
       icon: '@mipmap/ic_launcher',
       playSound: true,
       enableVibration: vibrate,
-      sound: RawResourceAndroidNotificationSound(sound),
+      sound: _resolveSound(sound),
       fullScreenIntent: true,
     );
   }
 
-  NotificationDetails _notifDetails({String sound = 'alarm_default', bool vibrate = true}) {
+  NotificationDetails _notifDetails({
+    String sound = 'alarm_default',
+    bool vibrate = true,
+  }) {
     return NotificationDetails(
       android: _androidDetails(sound: sound, vibrate: vibrate),
       iOS: const DarwinNotificationDetails(
@@ -91,7 +111,7 @@ class NotificationService {
 
       await _plugin.zonedSchedule(
         task.id!,
-        '⏰ ${task.title}',
+        '📅 ${task.title}',
         task.description.isEmpty
             ? 'Đã đến giờ thực hiện công việc'
             : task.description,
@@ -115,7 +135,8 @@ class NotificationService {
       final now = tz.TZDateTime.now(tz.local);
 
       if (alarm.days.isEmpty) {
-        var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+        var scheduled =
+            tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
         if (scheduled.isBefore(now)) {
           scheduled = scheduled.add(const Duration(days: 1));
         }
@@ -152,7 +173,8 @@ class NotificationService {
 
   tz.TZDateTime _nextInstanceOfDay(int weekday, int hour, int minute) {
     final now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    var scheduled =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
     while (scheduled.weekday != weekday || scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }

@@ -37,7 +37,7 @@ class Alarm {
       case 'alarm_default': return 'Mặc định';
       case 'alarm_gentle': return 'Nhẹ nhàng';
       case 'alarm_energetic': return 'Năng động';
-      default: return 'Tùy chỉnh';
+      default: return sound.split('/').last;
     }
   }
 
